@@ -1,0 +1,8 @@
+#conf file
+.python-version
+.vscode
+
+
+cv-corpus/
+entestdata/
+frtestdata/
