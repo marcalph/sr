@@ -1,9 +1,9 @@
-#stdlib
+# stdlib
 import os
 import pathlib
 from itertools import combinations
 
-
+# third party
 import matplotlib.pyplot as plt
 import miniaudio
 import numpy as np
@@ -24,12 +24,12 @@ splits = """
 
 
 # intitial commonvoice dir located elsewhere
-common_voice = pathlib.Path("/home/marcalph/projects/slip/common-voice/cv-corpus")
-target_dir = pathlib.Path("data")
+cv_dir = pathlib.Path("/home/marcalph/Downloads/cv-corpus-6.1-2020-12-11/")
+test_dir = pathlib.Path("frtestdata")
 
 
-def commonvoice_df(datadir, split="train", lang="fr"):
-    """load commonvoice dir
+def commonvoice_df(datadir, split="test", lang="fr"):
+    """ load commonvoice dir
     """
     split = split + ".tsv"
     df = pd.read_table(datadir/lang/split, low_memory=False)
@@ -43,25 +43,25 @@ def commonvoice_df(datadir, split="train", lang="fr"):
     return df
 
 
-
-def wav2vec2encode(file):
-    audio = pydub.AudioSegment.from_mp3(file).set_frame_rate(16000)
-    print(target_dir/(os.path.splitext(os.path.basename(file))[0]+".wav"))
-    audio.export(target_dir/(os.path.splitext(os.path.basename(file))[0]+".wav"), format="wav")
-
-
-
-df = commonvoice_df(common_voice)
-df["dur"] = np.array([miniaudio.mp3_get_file_info(path).duration for path in df.path], np.float32)
-df.groupby("split").dur.sum()/3600
-
-df.path.apply(wav2vec2encode)
+def wav2vec2encode(filename, target_dir=test_dir):
+    """ convert .mp3 to .wav file w/ 16k frame rate
+    """
+    audio = pydub.AudioSegment.from_mp3(filename).set_frame_rate(16000)
+    print(target_dir/(os.path.splitext(os.path.basename(filename))[0]+".wav"))
+    audio.export(target_dir/(os.path.splitext(os.path.basename(filename))[0]+".wav"), format="wav")
+    return
 
 
-df.shape
+def playback(filename):
+    audio = pydub.AudioSegment.from_wav(filename)
+    pydub.playback.play(audio)
+    return
 
 
-len(list(target_dir.rglob("*.wav")))
 
-song = pydub.AudioSegment.from_wav("test.wav")
-pydub.playback.play(song)
+if __name__ == "__main__":
+    df = commonvoice_df(common_voice)
+    df["dur"] = np.array([miniaudio.mp3_get_file_info(path).duration for path in df.path], np.float32)
+    df.groupby("split").dur.sum()/3600
+    df.path.apply(wav2vec2encode)
+
