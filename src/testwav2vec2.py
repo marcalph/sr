@@ -8,6 +8,7 @@ import torch
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Tokenizer
 from scipy.io.wavfile import write
 import pydub
+import pandas as pd
 from pandarallel import pandarallel
 pandarallel.initialize(nb_workers=4)
 pd.set_option("max_colwidth", 50)
